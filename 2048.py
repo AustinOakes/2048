@@ -32,10 +32,10 @@ def PrintBoard(board):
         for tile in list:
             # Print out the number of leading characters 
             leadChars = 4 - len(str(tile))
+
             print( "[" + ("*" * leadChars) + str(tile) + "] ", end="")
 
         print("\n", end="")   
-
     print()
 
 def MoveTiles(board, dir):
@@ -63,15 +63,17 @@ def MoveTiles(board, dir):
                         board[temp-1][j] *= 2
                         board[temp][j] = 0
                         merged[temp-1][j] = True
-                    PrintBoard(board)
-                        
+
+            # Add a new tile to the board after we move existing tiles
+            AddTile(board)
+
         case 'D':
-            for i in range(2, -1, -1):
+            for i in range(3, -1, -1):
                 for j in range(4): 
                         
                     temp = i
 
-                    # Move upwards in the column until we find an empty spot
+                    # Move downwards in the column until we find an empty spot
                     while temp < 3 and board[temp+1][j] == 0:
                         board[temp+1][j] = board[temp][j]
                         board[temp][j] = 0
@@ -82,7 +84,10 @@ def MoveTiles(board, dir):
                         board[temp+1][j] *= 2
                         board[temp][j] = 0
                         merged[temp+1][j] = True
-                    PrintBoard(board)
+
+            # Add a new tile to the board after we move existing tiles
+            AddTile(board)
+
         case 'L':
             for j in range(1, 4):
                 for i in range(0, 4): 
@@ -91,7 +96,7 @@ def MoveTiles(board, dir):
 
                     # Move left in the row until we find an empty spot
                     while temp > 0 and board[i][temp-1] == 0:
-                        board[i][temp-1] = board[i][temp-1]
+                        board[i][temp-1] = board[i][temp]
                         board[i][temp] = 0
                         temp -= 1
 
@@ -100,9 +105,31 @@ def MoveTiles(board, dir):
                         board[i][temp-1] *= 2
                         board[i][temp] = 0
                         merged[i][temp-1] = True
-                    PrintBoard(board)
+
+            # Add a new tile to the board after we move existing tiles
+            AddTile(board)
+
         case 'R':
-            print("User pressed right!")
+            for j in range(3, -1, -1):
+                for i in range(4): 
+                        
+                    temp = j
+
+                    # Move right in the row until we find an empty spot
+                    while temp < 3 and board[i][temp+1] == 0:
+                        board[i][temp+1] = board[i][temp]
+                        board[i][temp] = 0
+                        temp += 1
+
+                    # Merge the tiles if they are the same and the top one hasn't been merged already
+                    if temp < 3 and board[i][temp+1] == board[i][temp] and not merged[i][temp+1]:
+                        board[i][temp+1] *= 2
+                        board[i][temp] = 0
+                        merged[i][temp+1] = True
+            
+            # Add a new tile to the board after we move existing tiles
+            AddTile(board)
+
         case _:
             print("User did not press an arrow key")
 
@@ -128,7 +155,15 @@ def PromptUser(board):
     with kb.Listener(on_press=on_press) as listener:
         listener.join()
 
+def IsFinished(board):
+    
+    WINNING_SCORE = 2048
 
+    if any(WINNING_SCORE in row for row in board):
+        print("YOU wON!!!")
+        return True
+    else:
+        return False
 
 # Start by setting up the board
 SetBoard(board)
@@ -141,10 +176,7 @@ for i in range (0, 10):
 print("Start:")
 PrintBoard(board)
 
-PromptUser(board)
-#PrintBoard(board)
-
-
-
+while not IsFinished(board):
+    PromptUser(board)
+    PrintBoard(board)
     
- 
