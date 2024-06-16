@@ -12,35 +12,29 @@ def SetBoard(board):
 # Check adjacent tiles for any possible moves
 def IsMoreMoves(board):
 
-    isMove = False
-
-    for i in range(0, 4):
-        for j in range(0, 4):
-
-            if i > 0:
-                if board[i-1][j] == board[i][j] or board[i-1][j] == 0:
-                    isMove = True
-
-            if i < 3:
-                if board[i-1][j] == board[i][j] or board[i+1][j] == 0:
-                    isMove = True
-
-            if j > 0:
-                if board[i-1][j] == board[i][j] or board[i][j-1] == 0:
-                    isMove = True
-
-            if j < 3:
-                if board[i-1][j] == board[i][j] or board[i][j+1] == 0:
-                    isMove = True
-            
-    return isMove
+    for i in range(len(board)):
+        for j in range(len(board[i])):
+            # Check if the current cell is empty
+            if board[i][j] == 0:
+                return True
+            # Check the cell to the right if it's not the last column
+            if j < len(board[i]) - 1 and board[i][j] == board[i][j + 1]:
+                return True
+            # Check the cell below if it's not the last row
+            if i < len(board) - 1 and board[i][j] == board[i + 1][j]:
+                return True
+    return False
 
 # Populate a new "tile" on the board
 def AddTile(board, num=0):
+    
+    if not any(0 in row for row in board):
+        return
+
     i = np.random.randint(4)
     j = np.random.randint(4)
 
-    while board[i][j] or not IsMoreMoves(board):
+    while board[i][j] != 0 and IsMoreMoves(board):
         i = np.random.randint(4)
         j = np.random.randint(4)
 
@@ -176,7 +170,7 @@ def IsFinished(board):
 
     # Check if any of the lists within board contain the winning score
     if any(WINNING_SCORE in row for row in board):
-        print("YOU wON!!!")
+        print("YOU WON!!!")
         return True
     else:
         return False
@@ -185,14 +179,12 @@ def IsFinished(board):
 
 # Start by setting up the board, and starting of the first turn
 SetBoard(board)
-AddTile(board)
-PrintBoard(board)
-PromptUser(board)
 
 # Continue while the game is not completed
-while not IsFinished(board):
+
+while not IsFinished(board) and IsMoreMoves(board):
     AddTile(board)
     PrintBoard(board)
     PromptUser(board)
     
-    
+print("game over")
