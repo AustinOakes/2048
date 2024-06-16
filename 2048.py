@@ -5,22 +5,48 @@ board = []
 
 # Set the initial state of the board. In this case a 4x4 square.
 def SetBoard(board):
-    for i in range(0, 4):
+    for _ in range(0, 4):
         board.append([0] * 4)
-    
-    AddTile(board, 2)
+
+
+# Check adjacent tiles for any possible moves
+def IsMoreMoves(board):
+
+    isMove = False
+
+    for i in range(0, 4):
+        for j in range(0, 4):
+
+            if i > 0:
+                if board[i-1][j] == board[i][j] or board[i-1][j] == 0:
+                    isMove = True
+
+            if i < 3:
+                if board[i-1][j] == board[i][j] or board[i+1][j] == 0:
+                    isMove = True
+
+            if j > 0:
+                if board[i-1][j] == board[i][j] or board[i][j-1] == 0:
+                    isMove = True
+
+            if j < 3:
+                if board[i-1][j] == board[i][j] or board[i][j+1] == 0:
+                    isMove = True
+            
+    return isMove
 
 # Populate a new "tile" on the board
 def AddTile(board, num=0):
     i = np.random.randint(4)
     j = np.random.randint(4)
 
-    while board[i][j]:
+    while board[i][j] or not IsMoreMoves(board):
         i = np.random.randint(4)
         j = np.random.randint(4)
 
     if num == 0:
         board[i][j] = np.random.choice([2, 4])
+        print("Added tile")
     else:
         board[i][j] = num
 
@@ -64,9 +90,6 @@ def MoveTiles(board, dir):
                         board[temp][j] = 0
                         merged[temp-1][j] = True
 
-            # Add a new tile to the board after we move existing tiles
-            AddTile(board)
-
         case 'D':
             for i in range(3, -1, -1):
                 for j in range(4): 
@@ -84,9 +107,6 @@ def MoveTiles(board, dir):
                         board[temp+1][j] *= 2
                         board[temp][j] = 0
                         merged[temp+1][j] = True
-
-            # Add a new tile to the board after we move existing tiles
-            AddTile(board)
 
         case 'L':
             for j in range(1, 4):
@@ -106,9 +126,6 @@ def MoveTiles(board, dir):
                         board[i][temp] = 0
                         merged[i][temp-1] = True
 
-            # Add a new tile to the board after we move existing tiles
-            AddTile(board)
-
         case 'R':
             for j in range(3, -1, -1):
                 for i in range(4): 
@@ -126,9 +143,6 @@ def MoveTiles(board, dir):
                         board[i][temp+1] *= 2
                         board[i][temp] = 0
                         merged[i][temp+1] = True
-            
-            # Add a new tile to the board after we move existing tiles
-            AddTile(board)
 
         case _:
             print("User did not press an arrow key")
@@ -157,26 +171,28 @@ def PromptUser(board):
 
 def IsFinished(board):
     
+    # Size of tile needed to win the game
     WINNING_SCORE = 2048
 
+    # Check if any of the lists within board contain the winning score
     if any(WINNING_SCORE in row for row in board):
         print("YOU wON!!!")
         return True
     else:
         return False
 
-# Start by setting up the board
-SetBoard(board)
-
 #****************Testing section******************#
 
-for i in range (0, 10):
-    AddTile(board)
-
-print("Start:")
+# Start by setting up the board, and starting of the first turn
+SetBoard(board)
+AddTile(board)
 PrintBoard(board)
+PromptUser(board)
 
+# Continue while the game is not completed
 while not IsFinished(board):
-    PromptUser(board)
+    AddTile(board)
     PrintBoard(board)
+    PromptUser(board)
+    
     
