@@ -40,7 +40,6 @@ def AddTile(board, num=0):
 
     if num == 0:
         board[i][j] = np.random.choice([2, 4])
-        print("Added tile")
     else:
         board[i][j] = num
 
@@ -185,6 +184,8 @@ SetBoard(board)
 while not IsFinished(board) and IsMoreMoves(board):
     AddTile(board)
     PrintBoard(board)
-    PromptUser(board)
-    
-print("game over")
+    if IsMoreMoves(board) and not IsFinished(board):
+        PromptUser(board)
+
+if not IsMoreMoves(board) and not IsFinished(board):
+    print("GAME OVER")
